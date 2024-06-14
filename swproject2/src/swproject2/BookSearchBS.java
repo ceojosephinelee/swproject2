@@ -1,6 +1,5 @@
 package swproject2;
 
-
 import java.util.Arrays;
 
 public class BookSearchBS {
@@ -11,6 +10,16 @@ public class BookSearchBS {
     public BookSearchBS(Book[] books) {
         this.books = books;
         Arrays.sort(this.books, (b1, b2) -> Integer.compare(b1.getId(), b2.getId()));
+    }
+
+    // 책의 고유 아이디를 사용하여 일반 탐색(선형 탐색)을 통해 책을 찾는 메서드
+    public Book search(int targetId) {
+        for (Book book : books) {
+            if (book.getId() == targetId) {
+                return book;
+            }
+        }
+        return null;
     }
 
     // 책의 고유 아이디를 사용하여 이진 탐색을 통해 책을 찾는 메서드
@@ -31,25 +40,53 @@ public class BookSearchBS {
         return null; // 책을 찾지 못한 경우
     }
 
-    // 메인 메서드: BookSearchBS를 테스트
+    // 일반 탐색과 이진 탐색의 성능을 비교하는 메서드
+    public void comparePerformance(int targetId) {
+        long startTime, endTime;
+
+        // 일반 탐색 성능 측정
+        startTime = System.nanoTime();
+        search(targetId);
+        endTime = System.nanoTime();
+        System.out.println("일반 탐색 시간: " + (endTime - startTime) + " 나노초");
+
+        // 이진 탐색 성능 측정
+        startTime = System.nanoTime();
+        search_bs(targetId);
+        endTime = System.nanoTime();
+        System.out.println("이진 탐색 시간: " + (endTime - startTime) + " 나노초");
+    }
+
+    // 메인 메서드: BookSearchBS를 테스트 및 성능 비교
     public static void main(String[] args) {
-        Book[] books = {
-            new Book(1, "Title1", "Author1", 2001),
-            new Book(2, "Title2", "Author2", 2002),
-            new Book(3, "Title3", "Author3", 2003),
-            new Book(4, "Title4", "Author4", 2004),
-            new Book(5, "Title5", "Author5", 2005)
-        };
+        Book[] books = new Book[10000];
+        for (int i = 0; i < books.length; i++) {
+            books[i] = new Book(i + 1, "Title" + (i + 1), "Author" + (i + 1), 2000 + (i % 20));
+        }
 
         BookSearchBS bookSearch = new BookSearchBS(books);
 
-        int targetId = 3;
-        Book result = bookSearch.search_bs(targetId);
+        int targetId = 5000;
+
+        System.out.println("=== 성능 비교 시작 ===");
+        bookSearch.comparePerformance(targetId);
+        System.out.println("=== 성능 비교 종료 ===");
+
+        Book result = bookSearch.search(targetId);
 
         if (result != null) {
-            System.out.println("책을 찾았습니다: " + result);
+            System.out.println("일반 탐색: 책을 찾았습니다: " + result);
         } else {
-            System.out.println("책을 찾지 못했습니다.");
+            System.out.println("일반 탐색: 책을 찾지 못했습니다.");
+        }
+
+        result = bookSearch.search_bs(targetId);
+
+        if (result != null) {
+            System.out.println("이진 탐색: 책을 찾았습니다: " + result);
+        } else {
+            System.out.println("이진 탐색: 책을 찾지 못했습니다.");
         }
     }
 }
+
